@@ -52,15 +52,10 @@ public class GameController {
             boardView.drawBoard(game.getBoard());
 
             final Player player = game.getPlayers()[turn];
+            final Integer posX = getPosX(game);
+            final Integer posY = getPosY(game);
 
-            out.println("Select X position");
-            String posX = bufferedReader.readLine();
-
-            out.println("Select Y position");
-            String posY = bufferedReader.readLine();
-
-            o
-            gameService.setPosition(game, Integer.parseInt(posY) - 1, Integer.parseInt(posX) - 1, player);
+            gameService.setPosition(game, posY - 1, posX - 1, player);
 
             turn++;
 
@@ -68,6 +63,48 @@ public class GameController {
                 turn = 0;
             }
         }
+    }
 
+    private Integer getPosX(final Game game) throws IOException {
+        out.println();
+        out.println("Select X position");
+
+        String posX = bufferedReader.readLine();
+        if (!isValidNumber(posX, game)) {
+            return getPosX(game);
+        }
+
+        return Integer.parseInt(posX);
+    }
+
+    private Integer getPosY(final Game game) throws IOException {
+        out.println();
+        out.println("Select Y position");
+
+        String posY = bufferedReader.readLine();
+        if (!isValidNumber(posY, game)) {
+            return getPosY(game);
+        }
+
+        return Integer.parseInt(posY);
+    }
+
+    private boolean isValidNumber(final String number, final Game game) {
+        try {
+            final Integer numberToValidate = Integer.parseInt(number);
+
+            if (numberToValidate > game.getBoard().getSize()) {
+                throw new NumberFormatException("Is bigger than board size");
+            }
+
+            return true;
+        } catch (final NumberFormatException exception) {
+            boardView.drawBoard(game.getBoard());
+
+            out.println();
+            out.println("Invalid number " + exception.getMessage() + " try again");
+
+            return false;
+        }
     }
 }
