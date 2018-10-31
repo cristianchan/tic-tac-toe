@@ -27,12 +27,4 @@ public class BoardView {
             out.println("  ");
         }
     }
-
-    public void drawBoardSizeSelection() {
-        out.println("Select size of board should be 3 to 10");
-    }
-
-    public void drawPlayerSelectPosition(final Integer number) {
-        out.println("Select player" + number + "name");
-    }
 }

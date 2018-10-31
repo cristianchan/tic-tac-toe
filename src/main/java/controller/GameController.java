@@ -25,86 +25,65 @@ public class GameController {
         this.bufferedReader = new BufferedReader(this.inputStreamReader);
     }
 
-    public Integer getGameConfiguration() throws IOException {
-        boardView.drawBoardSizeSelection();
-        String boardSize;
-        boardSize = bufferedReader.readLine();
+    public Game starGame(final Game game, Integer turn) throws IOException {
+        Boolean winnerExist = false;
 
-        try {
-            final Integer size = Integer.parseInt(boardSize);
-
-            if (size < 3 || size > 10) {
-                throw new NumberFormatException("Invalid range of size");
-            }
-
-            return size;
-        } catch (final NumberFormatException exception) {
-            out.println("You most be enter a valid number");
-        }
-
-        return getGameConfiguration();
-    }
-
-    public void starGame(final Game game) throws IOException {
-        int turn = 0;
-        while (true) {
-
+        while (!winnerExist) {
             boardView.drawBoard(game.getBoard());
 
             final Player player = game.getPlayers()[turn];
-            final Integer posX = getPosX(game);
-            final Integer posY = getPosY(game);
+            final Integer posX = getPosX(game, player);
+            final Integer posY = getPosY(game, player);
 
+            if (gameService.isSelectedCell(game, posY - 1, posX - 1)) {
+                return starGame(game, turn);
+            }
             gameService.setPosition(game, posY - 1, posX - 1, player);
 
-            turn++;
+            if (gameService.isPlayerWin(game, posY, posX, player)) {
+                out.println("Congrats!! " + player.getName() + "Win");
+                out.println();
+                boardView.drawBoard(game.getBoard());
+                winnerExist = true;
+            }
 
+            turn++;
             if (turn > 2) {
                 turn = 0;
             }
         }
+
+        return game;
     }
 
-    private Integer getPosX(final Game game) throws IOException {
+
+    private Integer getPosX(final Game game, final Player player) throws IOException {
         out.println();
-        out.println("Select X position");
+        out.println(player.getName() + " select X position");
 
         String posX = bufferedReader.readLine();
-        if (!isValidNumber(posX, game)) {
-            return getPosX(game);
+
+        if (!gameService.isValidNumber(posX, game)) {
+            boardView.drawBoard(game.getBoard());
+
+            return getPosX(game, player);
         }
 
         return Integer.parseInt(posX);
     }
 
-    private Integer getPosY(final Game game) throws IOException {
+    private Integer getPosY(final Game game, final Player player) throws IOException {
         out.println();
-        out.println("Select Y position");
+        out.println(player.getName() + " select Y position");
 
         String posY = bufferedReader.readLine();
-        if (!isValidNumber(posY, game)) {
-            return getPosY(game);
+
+        if (!gameService.isValidNumber(posY, game)) {
+            boardView.drawBoard(game.getBoard());
+
+            return getPosY(game, player);
         }
 
         return Integer.parseInt(posY);
-    }
-
-    private boolean isValidNumber(final String number, final Game game) {
-        try {
-            final Integer numberToValidate = Integer.parseInt(number);
-
-            if (numberToValidate > game.getBoard().getSize()) {
-                throw new NumberFormatException("Is bigger than board size");
-            }
-
-            return true;
-        } catch (final NumberFormatException exception) {
-            boardView.drawBoard(game.getBoard());
-
-            out.println();
-            out.println("Invalid number " + exception.getMessage() + " try again");
-
-            return false;
-        }
     }
 }
