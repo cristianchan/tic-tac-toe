@@ -16,11 +16,8 @@ import java.util.Random;
 import static model.Cell.Status.SELECTED;
 import static model.Cell.Status.UNSELECTED;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -361,7 +358,8 @@ public class GameServiceTest {
 
         final Game game = getGame();
 
-        int x = game.getBoard().getSize() - 1;;
+        int x = game.getBoard().getSize() - 1;
+        ;
         for (int y = 0; y < game.getBoard().getSize(); y++) {
             final Cell cell = game.getBoard().getCells()[y][posX];
             cell.setSelected(player);
@@ -398,6 +396,72 @@ public class GameServiceTest {
         final Boolean isPlayerWin = subject.isPlayerWin(game, posY, posX, player);
 
         assertFalse(isPlayerWin);
+    }
+
+    @Test
+    public void getCPUCell_PlayerWinInNextMove_Cell() {
+        final String playerName = randomAlphabetic(10);
+        final String playerSymbol = randomAlphabetic(2);
+        final Player player = new Player(playerName, playerSymbol);
+
+        final Integer posX = 0;
+
+        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
+
+        when(properties.getProperty("player-one.name")).thenReturn(playerName);
+        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
+
+        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
+
+        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
+
+        final Game game = getGame();
+
+        for (int y = 0; y < game.getBoard().getSize() - 1; y++) {
+            final Cell cell = game.getBoard().getCells()[y][posX];
+            cell.setSelected(player);
+        }
+
+        final Cell cell = subject.getCpuCell(game, properties, player);
+
+        assertThat(cell, is(notNullValue()));
+        assertThat(cell.getY(), is(BOARD_SIZE - 1));
+        assertThat(cell.getX(), is(0));
+    }
+
+    @Test
+    public void getCPUCell_PlayerNotWinInNextMove_Cell() {
+        final String playerName = randomAlphabetic(10);
+        final String playerSymbol = randomAlphabetic(2);
+        final Player player = new Player(playerName, playerSymbol);
+
+        final Integer posX = 0;
+
+        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
+
+        when(properties.getProperty("player-one.name")).thenReturn(playerName);
+        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
+
+        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
+
+        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
+
+        final Game game = getGame();
+
+        for (int y = 0; y < game.getBoard().getSize() - 2; y++) {
+            final Cell cell = game.getBoard().getCells()[y][posX];
+            cell.setSelected(player);
+        }
+
+        final Cell cell = subject.getCpuCell(game, properties, player);
+
+        assertThat(cell, is(notNullValue()));
+        assertThat(cell.getY(), is(0));
+        assertThat(cell.getX(), is(1));
     }
 
     private Game getGame() {
