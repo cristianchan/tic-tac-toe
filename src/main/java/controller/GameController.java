@@ -38,12 +38,19 @@ public class GameController {
             if (gameService.isSelectedCell(game, posY - 1, posX - 1)) {
                 return starGame(game, turn);
             }
+
             gameService.setPosition(game, posY - 1, posX - 1, player);
 
             if (gameService.isPlayerWin(game, posY, posX, player)) {
-                out.println("Congrats!! " + player.getName() + "Win");
+                out.println("Congrats!! " + player.getName() + " Win");
                 out.println();
                 boardView.drawBoard(game.getBoard());
+                winnerExist = true;
+            }
+
+
+            if(gameService.isDraw(game)){
+                out.println("So sad!!!!! is a draw");
                 winnerExist = true;
             }
 

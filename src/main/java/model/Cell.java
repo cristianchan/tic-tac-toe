@@ -1,5 +1,8 @@
 package model;
 
+import static model.Cell.Status.SELECTED;
+import static model.Cell.Status.UNSELECTED;
+
 public class Cell {
     private final Integer x;
     private final Integer y;
@@ -9,7 +12,7 @@ public class Cell {
     public Cell(Integer x, Integer y) {
         this.x = x;
         this.y = y;
-        this.status = Status.UNSELECTED;
+        this.status = UNSELECTED;
     }
 
     public Integer getX() {
@@ -21,8 +24,13 @@ public class Cell {
     }
 
     public void setSelected(final Player player) {
-        this.status = Status.SELECTED;
+        this.status = SELECTED;
         this.player = player;
+    }
+
+    public void setUnSelected() {
+        this.status = UNSELECTED;
+        this.player = null;
     }
 
     public Status getStatus() {
