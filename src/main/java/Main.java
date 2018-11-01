@@ -7,10 +7,12 @@ import view.BoardView;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Random;
 
 public class Main {
     public static void main(String... args) throws IOException {
 
+        final Random random = new Random();
         final GameConfiguration gameConfiguration = new GameConfiguration();
         final Properties properties = gameConfiguration.getGameConfiguration();
 
@@ -21,6 +23,8 @@ public class Main {
         final GameController gameController = new GameController(boardView, gameService);
         final Game game = new Game(bord, properties);
 
-        gameController.starGame(game, 0);
+
+
+        gameController.starGame(game, random.nextInt(3), properties);
     }
 }

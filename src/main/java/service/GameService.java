@@ -8,6 +8,7 @@ import model.Player;
 import java.util.Properties;
 
 import static java.lang.System.out;
+import static java.util.Objects.isNull;
 import static model.Cell.Status.SELECTED;
 import static model.Cell.Status.UNSELECTED;
 
@@ -57,7 +58,7 @@ public class GameService {
     }
 
     public boolean isPlayerWin(final Game game, final Integer posY, final Integer posX, final Player player) {
-        return isRowComplete(game, posY - 1, player) || isColumnComplete(game, posX - 1, player) ||
+        return isRowComplete(game, posY, player) || isColumnComplete(game, posX, player) ||
                 isDiagonalAtCeroComplete(game, player) || isDiagonalAtBoarSizeComplete(game, player);
     }
 
@@ -75,49 +76,49 @@ public class GameService {
         return true;
     }
 
-    public void selectCpuCell(final Game game, final Properties properties, final Player player) {
-        if (!isSetCPUPositionIfAPlayerWinInNextMove(game, properties, player)) {
-            setCPUPosition(game, properties, player);
+    public Cell getCpuCell(final Game game, final Properties properties, final Player player) {
+        final Cell cell = getCPUPositionIfAPlayerWinInNextMove(game, properties);
+        if (isNull(cell)) {
+            return getCPUPosition(game);
         }
+        return cell;
     }
 
-    private boolean isSetCPUPositionIfAPlayerWinInNextMove(final Game game, final Properties properties, final Player player) {
+    private Cell getCPUPositionIfAPlayerWinInNextMove(final Game game, final Properties properties) {
         final Cell[][] cells = game.getBoard().getCells();
         final Player[] players = new Player[]{
                 game.getPlayers()[0], game.getPlayers()[1]
         };
 
-        final Game gameCopy = new Game(game.getBoard(), properties);
-
-        for(final Player verifyPlayer : players) {
+        for (final Player verifyPlayer : players) {
             for (final Cell[] row : cells) {
                 for (final Cell cell : row) {
                     if (cell.getStatus() == UNSELECTED) {
-                        setPosition(gameCopy, cell.getY(), cell.getX(), verifyPlayer);
-                        if (isPlayerWin(gameCopy, cell.getY(), cell.getX(), verifyPlayer)) {
-                            setPosition(game, cell.getY(), cell.getX(), player);
-                            return true;
-                        } else {
-                            unSetPosition(gameCopy, cell.getY(), cell.getX());
+                        setPosition(game, cell.getY(), cell.getX(), verifyPlayer);
+                        if (isPlayerWin(game, cell.getY(), cell.getX(), verifyPlayer)) {
+                            unSetPosition(game, cell.getY(), cell.getX());
+                            return game.getBoard().getCells()[cell.getY()][cell.getX()];
                         }
+                        unSetPosition(game, cell.getY(), cell.getX());
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
-    private void setCPUPosition(final Game game, final Properties properties, final Player player) {
+    private Cell getCPUPosition(final Game game) {
         final Cell[][] cells = game.getBoard().getCells();
-        final Game gameCopy = new Game(game.getBoard(), properties);
 
         for (final Cell[] row : cells) {
             for (final Cell cell : row) {
                 if (cell.getStatus() == UNSELECTED) {
-                    setPosition(gameCopy, cell.getY(), cell.getX(), player);
+                    return cell;
                 }
             }
         }
+
+        return null;
     }
 
     private boolean isRowComplete(final Game game, final Integer posY, final Player player) {

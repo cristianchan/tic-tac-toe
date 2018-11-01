@@ -15,12 +15,12 @@ public class Board {
 
         int y = 0;
 
-        for (Cell[] columns : cells) {
+        for (Cell[] row : cells) {
             int x = 0;
 
-            for (Cell cell : columns) {
+            for (Cell cell : row) {
                 cell = new Cell(x, y);
-                cells[x][y] = cell;
+                cells[y][x] = cell;
                 x++;
             }
 

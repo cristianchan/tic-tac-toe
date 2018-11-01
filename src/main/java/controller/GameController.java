@@ -1,5 +1,6 @@
 package controller;
 
+import model.Cell;
 import model.Game;
 import model.Player;
 import service.GameService;
@@ -8,6 +9,7 @@ import view.BoardView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 import static java.lang.System.in;
 import static java.lang.System.out;
@@ -25,37 +27,49 @@ public class GameController {
         this.bufferedReader = new BufferedReader(this.inputStreamReader);
     }
 
-    public Game starGame(final Game game, Integer turn) throws IOException {
+    public Game starGame(final Game game, Integer turn, final Properties properties) throws IOException {
         Boolean winnerExist = false;
 
         while (!winnerExist) {
-            boardView.drawBoard(game.getBoard());
-
+            final Integer posX;
+            final Integer posY;
             final Player player = game.getPlayers()[turn];
-            final Integer posX = getPosX(game, player);
-            final Integer posY = getPosY(game, player);
 
-            if (gameService.isSelectedCell(game, posY - 1, posX - 1)) {
-                return starGame(game, turn);
+            if (turn != 2) {
+                boardView.drawBoard(game.getBoard());
+                posX = getPosX(game, player) - 1;
+                posY = getPosY(game, player) - 1;
+            } else {
+                final Cell cpuCell = gameService.getCpuCell(game, properties, player);
+                posX = cpuCell.getX();
+                posY = cpuCell.getY();
             }
 
-            gameService.setPosition(game, posY - 1, posX - 1, player);
+
+            if (gameService.isSelectedCell(game, posY, posX)) {
+                return starGame(game, turn, properties);
+            }
+
+            gameService.setPosition(game, posY, posX, player);
 
             if (gameService.isPlayerWin(game, posY, posX, player)) {
+                out.println();
                 out.println("Congrats!! " + player.getName() + " Win");
                 out.println();
                 boardView.drawBoard(game.getBoard());
                 winnerExist = true;
             }
 
-
-            if(gameService.isDraw(game)){
+            if (gameService.isDraw(game)) {
+                out.println();
                 out.println("So sad!!!!! is a draw");
+                out.println();
+                boardView.drawBoard(game.getBoard());
                 winnerExist = true;
             }
 
             turn++;
-            if (turn > 2) {
+            if (turn > game.getPlayers().length - 1) {
                 turn = 0;
             }
         }
