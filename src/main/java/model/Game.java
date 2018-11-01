@@ -8,11 +8,14 @@ public class Game {
 
     public Game(final Board board, final Properties properties) {
         this.board = board;
-        this.players = new Player[3];
+        this.players = new Player[Integer.parseInt(properties.getProperty("player.number"))];
 
         players[0] = new Player(properties.getProperty("player-one.name"), properties.getProperty("player-one.symbol"));
         players[1] = new Player(properties.getProperty("player-two.name"), properties.getProperty("player-two.symbol"));
-        players[2] = new Player(properties.getProperty("player-tree.name"), properties.getProperty("player-tree.symbol"));
+
+        if (players.length > 2) {
+            players[2] = new Player(properties.getProperty("player-tree.name"), properties.getProperty("player-tree.symbol"));
+        }
     }
 
     public Board getBoard() {

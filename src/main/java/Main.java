@@ -25,6 +25,6 @@ public class Main {
 
 
 
-        gameController.starGame(game, random.nextInt(3), properties);
+        gameController.starGame(game, random.nextInt(game.getPlayers().length), properties);
     }
 }
