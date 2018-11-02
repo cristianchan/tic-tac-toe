@@ -5,9 +5,13 @@ import model.Game;
 import service.GameService;
 import view.BoardView;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Properties;
 import java.util.Random;
+
+import static java.lang.System.in;
 
 public class Main {
     public static void main(String... args) throws IOException {
@@ -20,9 +24,12 @@ public class Main {
         final Board bord = new Board(Integer.parseInt(boardSize));
         final BoardView boardView = new BoardView();
         final GameService gameService = new GameService();
-        final GameController gameController = new GameController(boardView, gameService);
-        final Game game = new Game(bord, properties);
 
+        final InputStreamReader inputStreamReader = new InputStreamReader(in);
+        final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+        final GameController gameController = new GameController(boardView, gameService, bufferedReader);
+        final Game game = new Game(bord, properties);
 
 
         gameController.starGame(game, random.nextInt(game.getPlayers().length), properties);

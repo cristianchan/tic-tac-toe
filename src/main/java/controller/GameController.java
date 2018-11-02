@@ -16,15 +16,13 @@ import static java.lang.System.out;
 
 public class GameController {
     private final BoardView boardView;
-    private final InputStreamReader inputStreamReader;
     private final BufferedReader bufferedReader;
     private final GameService gameService;
 
-    public GameController(BoardView boardView, GameService gameService) {
+    public GameController(BoardView boardView, GameService gameService, BufferedReader bufferedReader) {
         this.boardView = boardView;
         this.gameService = gameService;
-        this.inputStreamReader = new InputStreamReader(in);
-        this.bufferedReader = new BufferedReader(this.inputStreamReader);
+        this.bufferedReader = bufferedReader;
     }
 
     public Game starGame(final Game game, Integer turn, final Properties properties) throws IOException {
