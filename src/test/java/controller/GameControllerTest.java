@@ -133,7 +133,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void startGame_PersonTurn_GameRestartTurnSetPositionCPUWin() throws IOException {
+    public void startGame_CPUTurn_GameRestartTurnSetPositionCPUWin() throws IOException {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
         final Player player = new Player(playerName, playerSymbol);
@@ -165,6 +165,128 @@ public class GameControllerTest {
         assertEquals(formatMessage(message), formatMessage(outContent.toString()));
 
         verify(boardView).drawBoard(game.getBoard());
+    }
+
+    @Test
+    public void startGame_PersonTurnCellSelected_SetPositionPersonWin() throws IOException {
+        final String playerName = randomAlphabetic(10);
+        final String playerSymbol = randomAlphabetic(2);
+        final Player player = new Player(playerName, playerSymbol);
+
+
+        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
+        when(properties.getProperty("player-one.name")).thenReturn(playerName);
+        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
+        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
+
+
+        final Game game = getGame();
+        final Integer posX = random.nextInt(BOARD_SIZE) + 1;
+        final Integer posY = random.nextInt(BOARD_SIZE) + 1;
+
+        game.getPlayers()[0] = player;
+
+
+        when(bufferedReader.readLine()).thenReturn(posX.toString()).thenReturn(posY.toString())
+                .thenReturn(posX.toString())
+                .thenReturn(posY.toString());
+
+        when(gameService.isValidNumber(posX.toString(), game)).thenReturn(true);
+        when(gameService.isValidNumber(posY.toString(), game)).thenReturn(true);
+        when(gameService.isSelectedCell(game, posY - 1, posX - 1)).thenReturn(true).thenReturn(false);
+        when(gameService.isPlayerWin(game, posY - 1, posX - 1, player)).thenReturn(true);
+
+        final Game gameFinished = subjet.starGame(game, 0, properties);
+
+        final String messageWin = "Congrats!! " + player.getName() + " Win";
+
+        assertEquals(gameFinished, game);
+        assertTrue(outContent.toString().contains(messageWin));
+
+        verify(boardView, times(3)).drawBoard(game.getBoard());
+    }
+
+    @Test
+    public void startGame_PersonTurnInvalidPosXNumber_SetPositionPersonWin() throws IOException {
+        final String playerName = randomAlphabetic(10);
+        final String playerSymbol = randomAlphabetic(2);
+        final Player player = new Player(playerName, playerSymbol);
+
+
+        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
+        when(properties.getProperty("player-one.name")).thenReturn(playerName);
+        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
+        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
+
+
+        final Game game = getGame();
+        final Integer posX = random.nextInt(BOARD_SIZE) + 1;
+        final Integer posY = random.nextInt(BOARD_SIZE) + 1;
+
+        game.getPlayers()[0] = player;
+
+
+        when(bufferedReader.readLine()).thenReturn(posX.toString())
+                .thenReturn(posX.toString())
+                .thenReturn(posY.toString());
+
+        when(gameService.isValidNumber(posX.toString(), game)).thenReturn(false).thenReturn(true);
+        when(gameService.isValidNumber(posY.toString(), game)).thenReturn(true);
+        when(gameService.isSelectedCell(game, posY - 1, posX - 1)).thenReturn(false);
+        when(gameService.isPlayerWin(game, posY - 1, posX - 1, player)).thenReturn(true);
+
+        final Game gameFinished = subjet.starGame(game, 0, properties);
+
+        final String messageWin = "Congrats!! " + player.getName() + " Win";
+
+        assertEquals(gameFinished, game);
+        assertTrue(outContent.toString().contains(messageWin));
+    }
+
+    @Test
+    public void startGame_PersonTurnInvalidPosYNumber_SetPositionPersonWin() throws IOException {
+        final String playerName = randomAlphabetic(10);
+        final String playerSymbol = randomAlphabetic(2);
+        final Player player = new Player(playerName, playerSymbol);
+
+
+        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
+        when(properties.getProperty("player-one.name")).thenReturn(playerName);
+        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
+        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
+        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
+
+
+        final Game game = getGame();
+        final Integer posX = random.nextInt(BOARD_SIZE) + 1;
+        final Integer posY = random.nextInt(BOARD_SIZE) + 1;
+
+        game.getPlayers()[0] = player;
+
+
+        when(bufferedReader.readLine()).thenReturn(posX.toString())
+                .thenReturn(posY.toString())
+                .thenReturn(posY.toString());
+
+        when(gameService.isValidNumber(posX.toString(), game)).thenReturn(true);
+        when(gameService.isValidNumber(posY.toString(), game)).thenReturn(false).thenReturn(true);
+        when(gameService.isSelectedCell(game, posY - 1, posX - 1)).thenReturn(false);
+        when(gameService.isPlayerWin(game, posY - 1, posX - 1, player)).thenReturn(true);
+
+        final Game gameFinished = subjet.starGame(game, 0, properties);
+
+        final String messageWin = "Congrats!! " + player.getName() + " Win";
+
+        assertEquals(gameFinished, game);
+        assertTrue(outContent.toString().contains(messageWin));
     }
 
     private Game getGame() {
