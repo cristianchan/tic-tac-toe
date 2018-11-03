@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Random;
 
@@ -25,16 +27,21 @@ public class GameServiceTest {
     private static final Integer BOARD_SIZE = 5;
     private static final String PLAYER_NUMBER = "3";
 
-    private GameService subject;
-    private Random random;
-
     @Mock
     private Properties properties;
+
+    private GameService subject;
+    private Random random;
+    private ByteArrayOutputStream outContent;
 
     @Before
     public void setUp() {
         subject = new GameService();
         random = new Random();
+
+        outContent = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(outContent));
+        System.setOut(new PrintStream(outContent));
     }
 
     @Test
@@ -113,6 +120,7 @@ public class GameServiceTest {
         final Boolean isValidNumber = subject.isValidNumber(number, game);
 
         assertFalse(isValidNumber);
+        assertThat(outContent.toString().trim(), is("Invalid number For input string: \""+number + "\" try again"));
     }
 
     @Test
@@ -136,6 +144,7 @@ public class GameServiceTest {
         final Boolean isValidNumber = subject.isValidNumber(String.valueOf(number), game);
 
         assertFalse(isValidNumber);
+        assertThat(outContent.toString().trim(), is("Invalid number Is bigger than board size try again"));
     }
 
     @Test
@@ -159,6 +168,7 @@ public class GameServiceTest {
         final Boolean isValidNumber = subject.isValidNumber(String.valueOf(number), game);
 
         assertFalse(isValidNumber);
+        assertThat(outContent.toString().trim(), is("Invalid number The number should by grater than 0 try again"));
     }
 
     @Test
@@ -212,6 +222,7 @@ public class GameServiceTest {
         final Boolean isSelected = subject.isSelectedCell(game, posY, posX);
 
         assertTrue(isSelected);
+        assertThat(outContent.toString().trim(), is("The cell is selected"));
     }
 
     @Test
