@@ -6,13 +6,15 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class GameConfiguration {
-    public Properties getGameConfiguration() throws IOException {
-        InputStream inputStream;
+    private final InputStream inputStream;
 
+    public GameConfiguration(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public Properties getGameConfiguration() throws IOException {
         Properties prop = new Properties();
         String propFileName = "config.properties";
-
-        inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
 
         if (inputStream != null) {
             prop.load(inputStream);
