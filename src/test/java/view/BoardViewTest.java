@@ -1,11 +1,13 @@
 package view;
 
 import model.Board;
-import model.Player;
+import model.HumanPlayer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import service.HumanPlayerService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -23,6 +25,10 @@ public class BoardViewTest {
 
     private ByteArrayOutputStream outContent;
     private Random random;
+
+    @Mock
+    private HumanPlayerService humanPlayerService;
+
 
     @Before
     public void setUp() {
@@ -44,7 +50,7 @@ public class BoardViewTest {
                 "4  |   |   |   |   |   |   \n" +
                 "5  |   |   |   |   |   |   \n";
 
-        subject.drawBoard(board);
+        subject.printBoard(board);
 
         assertThat(boardDraw, is(outContent.toString()));
     }
@@ -55,7 +61,7 @@ public class BoardViewTest {
         final String name = randomAlphabetic(10);
         final Integer posX = 2;
         final Integer posY = 2;
-        final Player player = new Player(name, "X");
+        final HumanPlayer player = new HumanPlayer(name, "X", humanPlayerService);
 
         board.getCells()[posY][posX].setSelected(player);
 
@@ -66,7 +72,7 @@ public class BoardViewTest {
                 "4  |   |   |   |   |   |   \n" +
                 "5  |   |   |   |   |   |   \n";
 
-        subject.drawBoard(board);
+        subject.printBoard(board);
 
         assertThat(boardDraw, is(outContent.toString()));
     }

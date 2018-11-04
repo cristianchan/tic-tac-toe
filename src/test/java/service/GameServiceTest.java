@@ -1,42 +1,45 @@
 package service;
 
-import model.Board;
 import model.Cell;
 import model.Game;
-import model.Player;
+import model.HumanPlayer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Properties;
 import java.util.Random;
 
+import static factory.GameFactory.getGame;
 import static model.Cell.Status.SELECTED;
 import static model.Cell.Status.UNSELECTED;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GameServiceTest {
     private static final Integer BOARD_SIZE = 5;
-    private static final String PLAYER_NUMBER = "3";
+
+    @InjectMocks
+    private GameService subject;
 
     @Mock
-    private Properties properties;
+    private HumanPlayerService humanPlayerService;
 
-    private GameService subject;
+    @Mock
+    private CpuPlayerService cpuPlayerService;
+
     private Random random;
     private ByteArrayOutputStream outContent;
 
     @Before
     public void setUp() {
-        subject = new GameService();
         random = new Random();
 
         outContent = new ByteArrayOutputStream();
@@ -51,22 +54,9 @@ public class GameServiceTest {
 
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         subject.setPosition(game, posY, posX, player);
 
@@ -79,19 +69,7 @@ public class GameServiceTest {
         final Integer posX = random.nextInt(BOARD_SIZE);
         final Integer posY = random.nextInt(BOARD_SIZE);
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         subject.unSetPosition(game, posY, posX);
 
@@ -99,100 +77,6 @@ public class GameServiceTest {
         assertThat(game.getBoard().getCells()[posY][posX].getPlayer(), is(nullValue()));
     }
 
-    @Test
-    public void isValidNumber_StringValue_False() {
-        final String number = randomAlphabetic(10);
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
-
-        final Boolean isValidNumber = subject.isValidNumber(number, game);
-
-        assertFalse(isValidNumber);
-        assertThat(outContent.toString().trim(), is("Invalid number For input string: \""+number + "\" try again"));
-    }
-
-    @Test
-    public void isValidNumber_NumberGraterThanBoardSize_False() {
-        final Integer number = BOARD_SIZE + 1;
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
-
-        final Boolean isValidNumber = subject.isValidNumber(String.valueOf(number), game);
-
-        assertFalse(isValidNumber);
-        assertThat(outContent.toString().trim(), is("Invalid number Is bigger than board size try again"));
-    }
-
-    @Test
-    public void isValidNumber_NumberLowerThanOne_False() {
-        final Integer number = -1;
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
-
-        final Boolean isValidNumber = subject.isValidNumber(String.valueOf(number), game);
-
-        assertFalse(isValidNumber);
-        assertThat(outContent.toString().trim(), is("Invalid number The number should by grater than 0 try again"));
-    }
-
-    @Test
-    public void isValidNumber_CorrectNumber_True() {
-        final Integer number = 5;
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
-
-        final Boolean isValidNumber = subject.isValidNumber(String.valueOf(number), game);
-
-        assertTrue(isValidNumber);
-    }
 
     @Test
     public void isSelected_Selected_True() {
@@ -201,28 +85,15 @@ public class GameServiceTest {
 
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         game.getBoard().getCells()[posY][posX].setSelected(player);
 
         final Boolean isSelected = subject.isSelectedCell(game, posY, posX);
 
         assertTrue(isSelected);
-        assertThat(outContent.toString().trim(), is("The cell is selected"));
     }
 
     @Test
@@ -230,19 +101,7 @@ public class GameServiceTest {
         final Integer posX = random.nextInt(BOARD_SIZE);
         final Integer posY = random.nextInt(BOARD_SIZE);
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         final Boolean isSelected = subject.isSelectedCell(game, posY, posX);
 
@@ -253,23 +112,12 @@ public class GameServiceTest {
     public void isPlayerWin_RowComplete_True() {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
         final Integer posY = random.nextInt(BOARD_SIZE);
         final Integer posX = random.nextInt(BOARD_SIZE);
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
         final Cell[] row = game.getBoard().getCells()[posY];
 
         for (final Cell cell : row) {
@@ -285,23 +133,12 @@ public class GameServiceTest {
     public void isPlayerWin_ColumnComplete_True() {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
         final Integer posY = random.nextInt(BOARD_SIZE);
         final Integer posX = random.nextInt(BOARD_SIZE);
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         for (int y = 0; y < game.getBoard().getSize(); y++) {
             final Cell cell = game.getBoard().getCells()[y][posX];
@@ -314,26 +151,15 @@ public class GameServiceTest {
     }
 
     @Test
-    public void isPlayerWin_DiagonalAtCeroComplete_True() {
+    public void isPlayerWin_DiagonalAtZeroComplete_True() {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
         final Integer posY = 0;
         final Integer posX = 0;
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         int x = 0;
         for (int y = 0; y < game.getBoard().getSize(); y++) {
@@ -351,23 +177,12 @@ public class GameServiceTest {
     public void isPlayerWin_DiagonalAtBoarSizeComplete_True() {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
         final Integer posY = 0;
         final Integer posX = 0;
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         int x = game.getBoard().getSize() - 1;
         ;
@@ -386,99 +201,15 @@ public class GameServiceTest {
     public void isPlayerWin_NotWin_False() {
         final String playerName = randomAlphabetic(10);
         final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
+        final HumanPlayer player = new HumanPlayer(playerName, playerSymbol, humanPlayerService);
 
         final Integer posY = 0;
         final Integer posX = 0;
 
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-one.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
+        final Game game = getGame(humanPlayerService, cpuPlayerService);
 
         final Boolean isPlayerWin = subject.isPlayerWin(game, posY, posX, player);
 
         assertFalse(isPlayerWin);
-    }
-
-    @Test
-    public void getCPUCell_PlayerWinInNextMove_Cell() {
-        final String playerName = randomAlphabetic(10);
-        final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
-
-        final Integer posX = 0;
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(playerName);
-        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
-
-        for (int y = 0; y < game.getBoard().getSize() - 1; y++) {
-            final Cell cell = game.getBoard().getCells()[y][posX];
-            cell.setSelected(player);
-        }
-
-        final Cell cell = subject.getCpuCell(game, properties, player);
-
-        assertThat(cell, is(notNullValue()));
-        assertThat(cell.getY(), is(BOARD_SIZE - 1));
-        assertThat(cell.getX(), is(0));
-    }
-
-    @Test
-    public void getCPUCell_PlayerNotWinInNextMove_Cell() {
-        final String playerName = randomAlphabetic(10);
-        final String playerSymbol = randomAlphabetic(2);
-        final Player player = new Player(playerName, playerSymbol);
-
-        final Integer posX = 0;
-
-        when(properties.getProperty("player.number")).thenReturn(PLAYER_NUMBER);
-
-        when(properties.getProperty("player-one.name")).thenReturn(playerName);
-        when(properties.getProperty("player-one.symbol")).thenReturn(playerSymbol);
-
-        when(properties.getProperty("player-two.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-two.symbol")).thenReturn(randomAlphabetic(10));
-
-        when(properties.getProperty("player-tree.name")).thenReturn(randomAlphabetic(10));
-        when(properties.getProperty("player-tree.symbol")).thenReturn(randomAlphabetic(10));
-
-        final Game game = getGame();
-
-        for (int y = 0; y < game.getBoard().getSize() - 2; y++) {
-            final Cell cell = game.getBoard().getCells()[y][posX];
-            cell.setSelected(player);
-        }
-
-        final Cell cell = subject.getCpuCell(game, properties, player);
-
-        assertThat(cell, is(notNullValue()));
-        assertThat(cell.getY(), is(0));
-        assertThat(cell.getX(), is(1));
-    }
-
-    private Game getGame() {
-        final Board bord = new Board(BOARD_SIZE);
-        final Game game = new Game(bord, properties);
-
-        return game;
     }
 }

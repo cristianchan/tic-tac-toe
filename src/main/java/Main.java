@@ -2,7 +2,9 @@ import config.GameConfiguration;
 import controller.GameController;
 import model.Board;
 import model.Game;
+import service.CpuPlayerService;
 import service.GameService;
+import service.HumanPlayerService;
 import view.BoardView;
 
 import java.io.BufferedReader;
@@ -32,10 +34,11 @@ public class Main {
         final InputStreamReader inputStreamReader = new InputStreamReader(in);
         final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-        final GameController gameController = new GameController(boardView, gameService, bufferedReader);
-        final Game game = new Game(bord, properties);
+        final GameController gameController = new GameController(boardView, gameService);
+        final HumanPlayerService humanPlayerService = new HumanPlayerService(bufferedReader,boardView);
+        final CpuPlayerService cpuPlayerService = new CpuPlayerService(gameService);
+        final Game game = new Game(bord, properties, humanPlayerService, cpuPlayerService);
 
-
-        gameController.starGame(game, random.nextInt(game.getPlayers().length), properties);
+        gameController.starGame(game, random.nextInt(game.getPlayers().length));
     }
 }

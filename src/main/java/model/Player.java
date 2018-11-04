@@ -1,13 +1,17 @@
 package model;
 
-public class Player {
+import java.io.IOException;
+
+public abstract class Player {
     private final String name;
     private final String symbol;
 
-    public Player(String name, String symbol) {
+    protected Player(String name, String symbol) {
         this.name = name;
         this.symbol = symbol;
     }
+
+    public abstract Cell getCell(final Game game) throws IOException;
 
     public String getSymbol() {
         return symbol;
@@ -16,4 +20,5 @@ public class Player {
     public String getName() {
         return name;
     }
+
 }
