@@ -2,6 +2,12 @@ plugins {
     id 'java'
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'
+    }
+}
+
 group 'tic-tac-toe'
 version '1.0-SNAPSHOT'
 
