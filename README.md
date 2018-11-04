@@ -26,3 +26,43 @@ player-tree.symbol=Z
 ./gradlew jar
 java -jar ./build/libs/tic-tac-toe-1.0-SNAPSHOT.jar
 ```
+
+## Run 
+Select postition separate by coma (column,row)
+
+```
+     1   2   3   4
+1  |   |   |   |   |   
+2  |   |   |   |   |   
+3  |   |   |   |   |   
+4  |   |   |   |   |   
+
+Jose Select X,Y position
+2,2
+```
+Position selection next turn.
+
+```
+     1   2   3   4
+1  |   |   |   |   |   
+2  |   | X |   |   |   
+3  |   |   |   |   |   
+4  |   |   |   |   |   
+
+Joe Select X,Y position
+1,1
+
+```
+Computer select position automatically
+
+```
+CPU Select X,Y position
+
+     1   2   3   4
+1  | O | Z |   |   |   
+2  |   | X |   |   |   
+3  |   |   |   |   |   
+4  |   |   |   |   |  
+
+```
+
