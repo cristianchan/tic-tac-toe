@@ -27,7 +27,7 @@ player-tree.symbol=Z
 java -jar ./build/libs/tic-tac-toe-1.0-SNAPSHOT.jar
 ```
 
-## Run 
+## Play 
 Select postition separate by coma (column,row)
 
 ```
