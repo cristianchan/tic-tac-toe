@@ -16,6 +16,7 @@ import java.util.Random;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BoardViewTest {
@@ -75,5 +76,60 @@ public class BoardViewTest {
         subject.printBoard(board);
 
         assertThat(boardDraw, is(outContent.toString()));
+    }
+
+    @Test
+    public void printDrawMessage_Call_PrintMessage() {
+        subject.printDrawMessage();
+
+        assertThat(outContent.toString(), is("\nSo sad!!!!! is a draw\n"));
+    }
+
+    @Test
+    public void printWinMessage_Call_PrintMessage() {
+        final String playerName = randomAlphabetic(10);
+
+        subject.printWinMessage(playerName);
+
+        assertThat(outContent.toString(), is("\nCongrats!! " + playerName + " Win\n"));
+    }
+
+    @Test
+    public void printSelectPositionMessage_Call_PrintMessage() {
+        final String playerName = randomAlphabetic(10);
+
+        subject.printSelectPositionMessage(playerName);
+
+        assertThat(outContent.toString(), is("\n" + playerName + " Select X,Y position\n"));
+    }
+
+    @Test
+    public void printInputFormatError_Call_PrintMessage() {
+        subject.printInputFormatError();
+
+        assertThat(outContent.toString(), is("\nInvalid  input format try again\n"));
+    }
+
+    @Test
+    public void printNumberFormatError_Call_PrintMessage() {
+        final String error = randomAlphabetic(10);
+
+        subject.printNumberFormatError(error);
+
+        assertThat(outContent.toString(), is("\nInvalid number " + error + " try again\n"));
+    }
+
+    @Test
+    public void getNumberGreaterThanZeroErrorMessage_Call_ReturnMessage() {
+        final String message = subject.getNumberGreaterThanZeroErrorMessage();
+
+        assertThat(message, is("The number should by greater than 0"));
+    }
+
+    @Test
+    public void getNumberBiggerThanBoardSizeMessage_Call_ReturnMessage() {
+        final String message = subject.getNumberBiggerThanBoardSizeMessage();
+
+        assertThat(message, is("Is bigger than board size"));
     }
 }
